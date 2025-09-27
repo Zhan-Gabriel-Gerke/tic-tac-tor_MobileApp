@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36414.22 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tic-tac-tor_MobileApp", "tic-tac-tor_MobileApp.csproj", "{4DA59694-64FD-443C-97F8-76567E9CB563}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4DA59694-64FD-443C-97F8-76567E9CB563}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DA59694-64FD-443C-97F8-76567E9CB563}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DA59694-64FD-443C-97F8-76567E9CB563}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DA59694-64FD-443C-97F8-76567E9CB563}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2E992BD0-928D-41A0-8D6A-7D77B51B8748}
+	EndGlobalSection
+EndGlobal
