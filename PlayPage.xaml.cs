@@ -4,12 +4,12 @@ using System.Threading.Tasks;
 using System.Timers;
 public partial class PlayPage : ContentPage
 {
-    public Grid grid, buttonsGrid, mainGreed;
-    public BoxView boxView;
-    public Button start, restart, whoFirst;
-    public Label timeLabel, whosTurn;
-    public bool? whoStart; //true - X | false - O
-    public bool isRunning = false;
+    private Grid grid, buttonsGrid, mainGreed;
+    private BoxView boxView;
+    private Button start, restart, whoFirst;
+    private Label timeLabel, whosTurn;
+    private bool? whoStart; //true - X | false - O
+    private bool isRunning = false;
     private string[,] cells = new string[3, 3];
     private int count = 0;
     public PlayPage()
@@ -177,8 +177,22 @@ public partial class PlayPage : ContentPage
     private async Task restartGame()
     {
         var newPage = new PlayPage();
-        Navigation.InsertPageBefore(newPage, this);
-        await Navigation.PopAsync();
+
+
+        // находится ли текущая страница (this) в навигационном стеке?
+        if (Navigation.NavigationStack.Contains(this))
+        {
+
+            // Вставляем новую страницу ПЕРЕД текущей в стеке
+            Navigation.InsertPageBefore(newPage, this);
+
+            // Убираем текущую страницу из стека, чтобы показать новую
+            await Navigation.PopAsync();
+        }
+        else
+        {
+            Application.Current.MainPage = newPage;
+        }
     }
 
     private async void isThree(string symbol)
@@ -187,7 +201,7 @@ public partial class PlayPage : ContentPage
         {
             if (cells[i, 0] == symbol && cells[i, 1] == symbol && cells[i, 2] == symbol)
             {
-                DisplayAlert("We have the finner", symbol + " Won the game", "OK");
+                isWinner(symbol);
                 await restartGame();
             }
         }
@@ -217,7 +231,7 @@ public partial class PlayPage : ContentPage
         count++;
         if (count == 9)
         {
-            DisplayAlert("Next time", "We don't have the finner ", "OK");
+            await DisplayAlert("Next time", "We don't have the finner ", "OK");
             await restartGame();
         }
     }
@@ -226,7 +240,7 @@ public partial class PlayPage : ContentPage
     {
         await DisplayAlert("We have the finner", symbol + " Won the game", "OK");
         string labelText = timeLabel.Text;
-        FileManager.SaveGame(symbol, labelText);
+        await FileManager.SaveToFile(symbol, labelText);
         await restartGame();
     }
     private async void whoFirst_Clicked(object sender, EventArgs e)
@@ -271,14 +285,17 @@ public partial class PlayPage : ContentPage
 
     private async void restartGame_Clicked(object sender, EventArgs e)
     {
-        // Создаём новый экземпляр PlayPage
         var newPage = new PlayPage();
 
-        // Вставляем перед текущей страницей
-        Navigation.InsertPageBefore(newPage, this);
-
-        // Убираем текущую страницу
-        await Navigation.PopAsync();
+        if (Navigation.NavigationStack.Contains(this))
+        {
+            Navigation.InsertPageBefore(newPage, this);
+            await Navigation.PopAsync();
+        }
+        else
+        {
+            Application.Current.MainPage = newPage;
+        }
     }
 
     private void StartStopwatch(Label label)

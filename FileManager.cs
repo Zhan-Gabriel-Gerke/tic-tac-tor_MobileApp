@@ -4,16 +4,15 @@ namespace tic_tac_tor_MobileApp
 {
     public class FileManager
     {
-        private static string fileName = "gameData.txt";
-        private static string FilePath => Path.Combine(FileSystem.AppDataDirectory, fileName);
-
-        public static async Task SaveGame(string winner, string time)
+        private static string FilePath => Path.Combine(FileSystem.AppDataDirectory, "gameData.txt");
+        public static async Task SaveToFile(string winner, string time)
         {
             string line = $"{DateTime.Now};{winner};{time}";
+            //System.Diagnostics.Debug.WriteLine($"Файл сохраняется здесь: {FilePath}");
             await File.AppendAllTextAsync(FilePath, line + Environment.NewLine);
         }
 
-        public static async Task<List<string>> LoadGameAsync()
+        public static async Task<List<string>> LoadDataFromFile()
         {
             var list = new List<string>();
             if (File.Exists(FilePath))
