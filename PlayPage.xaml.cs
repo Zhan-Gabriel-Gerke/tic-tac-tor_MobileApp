@@ -1,11 +1,16 @@
 ﻿namespace tic_tac_tor_MobileApp;
 
+using System.Linq;
+using System.Threading.Tasks;
+using System.Timers;
 public partial class PlayPage : ContentPage
 {
     public Grid grid, buttonsGrid, mainGreed;
     public BoxView boxView;
-    public Button start, save, whoFirst;
+    public Button start, restart, whoFirst;
     public Label timeLabel, whosTurn;
+    public bool isRunning = false, whoStart; //true - X | false - O
+    private Timer _timer;
     public PlayPage()
     {
         {
@@ -16,7 +21,7 @@ public partial class PlayPage : ContentPage
                 BackgroundColor = Color.FromRgb(120, 30, 50),
                 RowDefinitions =
                 {
-                    new RowDefinition { Height = GridLength.Auto },  //кнопки
+                    new RowDefinition { Height = GridLength.Auto }, //кнопки
                     new RowDefinition { Height = new GridLength(1, GridUnitType.Star) } //поле
                 },
                     ColumnDefinitions =
@@ -82,9 +87,9 @@ public partial class PlayPage : ContentPage
                 BackgroundColor = Color.FromRgb(200, 200, 100),
                 TextColor = Colors.Black
             };
-            save = new Button
+            restart = new Button
             {
-                Text = "Save",
+                Text = "Restart",
                 FontSize = 20,
                 BackgroundColor = Color.FromRgb(200, 200, 100),
                 TextColor = Colors.Black
@@ -97,9 +102,13 @@ public partial class PlayPage : ContentPage
                 TextColor = Colors.Black
             };
 
+            whoFirst.Clicked += whoFirst_Clicked;
+            restart.Clicked += restartGame_Clicked;
+            start.Clicked += startGame_Clicked;
+
             whosTurn = new Label
             {
-                Text = "X's turn",
+                Text = "It's random turn now",
                 FontSize = 40,
                 HorizontalOptions = LayoutOptions.Center,
                 TextColor = Colors.White,
@@ -115,7 +124,7 @@ public partial class PlayPage : ContentPage
                 Margin = new Thickness(0, 50, 0, 20)
             };
             buttonsGrid.Add(start, 0, 0);
-            buttonsGrid.Add(save, 2, 0);
+            buttonsGrid.Add(restart, 2, 0);
             buttonsGrid.Add(whoFirst, 1, 0);
 
             mainGreed.Add(buttonsGrid, 0, 0);
@@ -128,16 +137,81 @@ public partial class PlayPage : ContentPage
 
     private void Tap_Tapped(object? sender, TappedEventArgs e)
     {
-        var box = (BoxView)sender;
-        var r = Microsoft.Maui.Controls.Grid.GetRow(box);
-        var v = Microsoft.Maui.Controls.Grid.GetColumn(box);
-
-        grid.Children.Remove(box);
-
-        var letter = new Label
+        if (isRunning)
         {
-        };
+            var box = (BoxView)sender;
+            var r = Microsoft.Maui.Controls.Grid.GetRow(box);
+            var v = Microsoft.Maui.Controls.Grid.GetColumn(box);
 
-        DisplayAlert("Info", $"Rida {r+1}, veerg {v+1}", "OK");
+            grid.Children.Remove(box);
+
+            var letter = new Label
+            {
+            };
+        }
+        else
+        {
+            DisplayAlert("Info", "Start the game", "OK");
+        }
+        
+        
     }
+
+    private async void whoFirst_Clicked(object sender, EventArgs e)
+    {
+        bool userChoce = await DisplayAlert(
+            "Who is the first?",
+            "Who is the first?",
+            "X",
+            "O"
+            );
+        whoStart = userChoce;
+
+        if (whoStart)
+        {
+            whoFirst.Text = "X's turn";
+        }else
+        {
+            whoFirst.Text = "O's turn";
+        }
+    }
+
+    private void startGame_Clicked(object sender, EventArgs e)
+    {
+        //
+        StartStopwatch(timeLabel);
+        buttonsGrid.Children.Remove(start);
+        isRunning = true;
+    }
+
+    private async void restartGame_Clicked(object sender, EventArgs e)
+    {
+        // Создаём новый экземпляр PlayPage
+        var newPage = new PlayPage();
+
+        // Вставляем перед текущей страницей
+        Navigation.InsertPageBefore(newPage, this);
+
+        // Убираем текущую страницу
+        await Navigation.PopAsync();
+    }
+
+    private void StartStopwatch(Label label)
+    {
+        int secondsElapsed = 0;
+
+        Timer timer = new Timer(1000);
+        timer.Elapsed += (s, e) =>
+        {
+            secondsElapsed++;
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                TimeSpan time = TimeSpan.FromSeconds(secondsElapsed);
+                label.Text = time.ToString(@"hh\:mm\:ss");
+            });
+        };
+        timer.AutoReset = true;
+        timer.Start();
+    }
+
 }
