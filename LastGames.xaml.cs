@@ -51,7 +51,17 @@ public partial class LastGames : ContentPage
         }
         else
         {
-            for (int i = 0; i < data.Count; i++)
+            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            Label labels = new Label
+            {
+                Text = "Data, Time, Who won, Spent Time",
+                FontSize = 20,
+                TextColor = Colors.Black
+            };
+            grid.Children.Add(labels);
+            Grid.SetRow(labels, 0);
+            Grid.SetColumn(labels, 0);
+            for (int i = 1; i < data.Count; i++)
             {
                 grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
