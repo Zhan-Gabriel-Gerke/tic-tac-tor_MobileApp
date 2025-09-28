@@ -1,6 +1,4 @@
 ﻿namespace tic_tac_tor_MobileApp;
-
-using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
 public partial class PlayPage : ContentPage
@@ -9,8 +7,11 @@ public partial class PlayPage : ContentPage
     public BoxView boxView;
     public Button start, restart, whoFirst;
     public Label timeLabel, whosTurn;
-    public bool isRunning = false, whoStart; //true - X | false - O
+    public bool? whoStart; //true - X | false - O
+    public bool isRunning = false;
     private Timer _timer;
+    private string[,] cells = new string[3, 3];
+    private int count = 0;
     public PlayPage()
     {
         {
@@ -145,9 +146,25 @@ public partial class PlayPage : ContentPage
 
             grid.Children.Remove(box);
 
+            string symbol = whoStart == true ? "X" : "O";
+            whoStart = whoStart == true ? false : true;
+            whoFirst_ChangeTheLabel();
             var letter = new Label
             {
+                Text = symbol,
+                FontSize = 30,
+                WidthRequest = 80,
+                HeightRequest = 80,
+                TextColor = Colors.Black,
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Center,
+                HorizontalTextAlignment = TextAlignment.Center,
+                VerticalTextAlignment = TextAlignment.Center,
+                BackgroundColor = Colors.White
             };
+            grid.Add(letter, v, r);
+            cells[r, v] = symbol;
+            isThree(symbol);
         }
         else
         {
@@ -157,6 +174,53 @@ public partial class PlayPage : ContentPage
         
     }
 
+    private async Task restartGame()
+    {
+        var newPage = new PlayPage();
+        Navigation.InsertPageBefore(newPage, this);
+        await Navigation.PopAsync();
+    }
+
+    private async void isThree(string symbol)
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            if (cells[i, 0] == symbol && cells[i, 1] == symbol && cells[i, 2] == symbol)
+            {
+                DisplayAlert("We have the finner", symbol + " Won the game", "OK");
+                await restartGame();
+            }
+        }
+
+        // Проверка столбцов
+        for (int j = 0; j < 3; j++)
+        {
+            if (cells[0, j] == symbol && cells[1, j] == symbol && cells[2, j] == symbol)
+            {
+                DisplayAlert("We have the finner", symbol + " Won the game", "OK");
+                await restartGame();
+            }
+        }
+
+        // Проверка диагоналей
+        if (cells[0, 0] == symbol && cells[1, 1] == symbol && cells[2, 2] == symbol)
+        {
+            DisplayAlert("We have the finner", symbol + " Won the game", "OK");
+            await restartGame();
+        }
+
+        if (cells[0, 2] == symbol && cells[1, 1] == symbol && cells[2, 0] == symbol)
+        {
+            DisplayAlert("We have the finner", symbol + " Won the game", "OK");
+            await restartGame();
+        }
+        count++;
+        if (count == 9)
+        {
+            DisplayAlert("Next time", "We don't have the finner ", "OK");
+            await restartGame();
+        }
+    }
     private async void whoFirst_Clicked(object sender, EventArgs e)
     {
         bool userChoce = await DisplayAlert(
@@ -166,13 +230,22 @@ public partial class PlayPage : ContentPage
             "O"
             );
         whoStart = userChoce;
+        whoFirst_ChangeTheLabel();
+    }
 
-        if (whoStart)
+    private void whoFirst_ChangeTheLabel()
         {
-            whoFirst.Text = "X's turn";
-        }else
+        if (!whoStart.HasValue)
         {
-            whoFirst.Text = "O's turn";
+            whoStart = new Random().Next(2) == 0;
+        }
+        if (whoStart == true)
+        {
+            whosTurn.Text = "X's turn";
+        }
+        else
+        {
+            whosTurn.Text = "O's turn";
         }
     }
 
@@ -182,6 +255,10 @@ public partial class PlayPage : ContentPage
         StartStopwatch(timeLabel);
         buttonsGrid.Children.Remove(start);
         isRunning = true;
+        if (!whoStart.HasValue)
+        {
+            whoFirst_ChangeTheLabel();
+        }
     }
 
     private async void restartGame_Clicked(object sender, EventArgs e)
