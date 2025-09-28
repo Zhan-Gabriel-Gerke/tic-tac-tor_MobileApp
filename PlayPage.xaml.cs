@@ -1,4 +1,5 @@
 ﻿namespace tic_tac_tor_MobileApp;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Timers;
 public partial class PlayPage : ContentPage
@@ -9,7 +10,6 @@ public partial class PlayPage : ContentPage
     public Label timeLabel, whosTurn;
     public bool? whoStart; //true - X | false - O
     public bool isRunning = false;
-    private Timer _timer;
     private string[,] cells = new string[3, 3];
     private int count = 0;
     public PlayPage()
@@ -197,22 +197,22 @@ public partial class PlayPage : ContentPage
         {
             if (cells[0, j] == symbol && cells[1, j] == symbol && cells[2, j] == symbol)
             {
-                DisplayAlert("We have the finner", symbol + " Won the game", "OK");
-                await restartGame();
+                isWinner(symbol);
+                return;
             }
         }
 
         // Проверка диагоналей
         if (cells[0, 0] == symbol && cells[1, 1] == symbol && cells[2, 2] == symbol)
         {
-            DisplayAlert("We have the finner", symbol + " Won the game", "OK");
-            await restartGame();
+            isWinner(symbol);
+            return;
         }
 
         if (cells[0, 2] == symbol && cells[1, 1] == symbol && cells[2, 0] == symbol)
         {
-            DisplayAlert("We have the finner", symbol + " Won the game", "OK");
-            await restartGame();
+            isWinner(symbol);
+            return;
         }
         count++;
         if (count == 9)
@@ -220,6 +220,14 @@ public partial class PlayPage : ContentPage
             DisplayAlert("Next time", "We don't have the finner ", "OK");
             await restartGame();
         }
+    }
+
+    private async void isWinner(string symbol)
+    {
+        await DisplayAlert("We have the finner", symbol + " Won the game", "OK");
+        string labelText = timeLabel.Text;
+        FileManager.SaveGame(symbol, labelText);
+        await restartGame();
     }
     private async void whoFirst_Clicked(object sender, EventArgs e)
     {
@@ -290,5 +298,4 @@ public partial class PlayPage : ContentPage
         timer.AutoReset = true;
         timer.Start();
     }
-
 }

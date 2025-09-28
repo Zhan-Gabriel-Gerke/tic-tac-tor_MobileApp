@@ -3,7 +3,7 @@
     public partial class MainPage : ContentPage
     {
         public List<ContentPage> pagesE = new List<ContentPage>() { new PlayPage(), new LastGames(), new Rules() };
-        public List<string> textsE = new List<string>() { "Play", "Last Games", "Rules" };
+        public List<string> textsE = new List<string>() { "Play", "Recent Games", "Rules" };
         ScrollView sv;
         Grid grid;
         public MainPage()
